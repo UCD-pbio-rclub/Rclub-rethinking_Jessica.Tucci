@@ -42,3 +42,4 @@ Dividing the number of ways for card 1 by the total number of ways we get:
 
 pr(card 1)=pr(other side is also black)=2 ways/3 total ways= 2/3
 
+**JNM: Nice Job!**

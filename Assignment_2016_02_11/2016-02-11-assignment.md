@@ -246,9 +246,12 @@ Pr(A|positive A)=Pr(Positive A|A)Pr(A)/Pr(Positive A)
 
 Probability that the test correctly identifies species A is Pr(Positive A|A)=0.8
 
-Probability that the test either correctly identifies species A or gives a false positive for species A when we acctually have species B is Pr(Positive A|A)Pr(A)+Pr(Posties A|B)Pr(B)=(0.8)(0.5)+(1-0.65)(0.5)=0.575
+Probability that the test either correctly identifies species A or gives a false positive for species A
+when we acctually have species B:
 
-Pr(A|postive A)=(0.8)(0.5)/(0.575)=0.69
+Pr(Positive A|A)Pr(A)+Pr(Positive A|B)Pr(B)=(0.8)(0.5)+(1-0.65)(0.5)=0.575
+
+Pr(A|positive A)=(0.8)(0.5)/(0.575)=0.69
 ```
 Using the prior calculated given the data of twins and then the single birth: Pr(A)=0.36
 ```
@@ -256,9 +259,12 @@ Pr(A|positive A)=Pr(Positive A|A)Pr(A)/Pr(Positive A)
 
 Probability that the test correctly identifies species A is Pr(Positive A|A)=0.8
 
-Probability that the test either correctly identifies species A or gives a false positive for species A when we acctually have species B is Pr(Positive A|A)Pr(A)+Pr(Posties A|B)Pr(B)=(0.8)(0.36)+(1-0.65)(0.64)=0.512
+Probability that the test either correctly identifies species A or gives a false positive for species A
+when we acctually have species B:
 
-Pr(A|postive A)=(0.8)(0.36)/(0.512)=0.5625
+Pr(Positive A|A)Pr(A)+Pr(Positive A|B)Pr(B)=(0.8)(0.36)+(1-0.65)(0.64)=0.512
+
+Pr(A|positive A)=(0.8)(0.36)/(0.512)=0.5625
 ```
 
 

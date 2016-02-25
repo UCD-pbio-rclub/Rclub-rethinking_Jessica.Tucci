@@ -1,24 +1,60 @@
 # Statistical Rethinking Chapter 3 problems
 
-__Name:__
+__Name: Jessica Tucci__
 
 ## 3E1
+```{r}
+p_grid <- seq( from=0 , to=1 , length.out=1000 ) 
+prior <- rep( 1 , 1000 )
+likelihood <- dbinom( 6 , size=9 , prob=p_grid )
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+set.seed(100)
+samples <- sample( p_grid , prob=posterior , size=1e4 , replace=TRUE )
+
+sum(samples<0.2)/1e4
+```
 
 ## 3E2
-
+```{r}
+sum(samples>0.8)/1e4
+```
 ## 3E3
-
+```{r}
+sum(samples > 0.2 & samples < 0.8)/1e4
+```
 ## 3E4
-
+```{R}
+quantile( samples , 0.2 )
+```
 ## 3E5
-
+```{R}
+quantile( samples , 0.8 )
+```
 ## 3E6
-
+```{R, warning=FALSE}
+suppressMessages(library(rethinking))
+HPDI( samples , prob=0.66 )
+```
 ## 3E7
-
+```{R}
+library(rethinking)
+PI( samples , prob=0.66 )
+```
 ## 3M1
-
+```{r}
+p_grid <- seq( from=0 , to=1 , length.out=1000 ) 
+prior <- rep( 1 , 1000 )
+likelihood <- dbinom( 8 , size=15 , prob=p_grid )
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+```
 ## 3M2
+```{r}
+set.seed(100)
+samples <- sample( p_grid , prob=posterior , size=1e4 , replace=TRUE )
+HPDI( samples , prob=0.9 )
+```
 
 _STOP AFTER 3M2 FOR 02/25 ASSIGNMENT_
 

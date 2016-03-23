@@ -87,7 +87,7 @@ precis( m4.1 )
 
 ```
 ##         Mean StdDev   5.5%  94.5%
-## mu    154.33   0.41 153.68 154.99
+## mu    154.34   0.41 153.68 154.99
 ## sigma   7.74   0.29   7.27   8.20
 ```
 
@@ -100,9 +100,13 @@ Three: α,β,and σ
 
 ## 4M3
 yi ~Normal(μ,σ)
+
 μi= α + βxi
+
 α~Normal(0, 50)
+
 β~Normal(0, 10)
+
 σ~Uniform(0, 50)
 
 ## 4M4
@@ -110,16 +114,24 @@ hi=height
 xi=year
 
 hi ~Normal(μi,σ)
+
 μi= α + βxi
+
 α~Normal(178, 100)
+
 β~Normal(0, 10)
+
 σ~Uniform(0, 50)
 
 ## 4M5
 hi ~Normal(μi,σ)
+
 μi= α + βxi
+
 α~Normal(120, 100)
+
 β~Normal(10, 10)
+
 σ~Uniform(0, 50)
 
 Center α around the mean given from the first year instead.
@@ -128,9 +140,13 @@ Assume that there is some positive effect between year and height, so change fro
 
 ## 4M6
 hi ~Normal(μi,σ)
+
 μi= α + βxi
+
 α~Normal(120, 64)
+
 β~Normal(10, 10)
+
 σ~Uniform(0, 50)
 
 I would change the prior for α's variance to 64.

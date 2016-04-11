@@ -134,13 +134,27 @@ P=Plant Diversity</p>
 </div>
 <div id="m1" class="section level2">
 <h2>5M1</h2>
+<p>Drinking whole fat milk is correlated with lower levels of obsesity. However, choice of low-fat milk over whole-fat milk is also correlated with those that are choosing to diet.</p>
 </div>
 <div id="m3" class="section level2">
 <h2>5M3</h2>
+<p>Those that get divorced proably also will remarry more often. Take into account how many times the person has been married.</p>
 </div>
 <div id="m4" class="section level2">
 <h2>5M4</h2>
+<p>library(rethinking) data(WaffleDivorce) setwd(“C:/Users/Jessica/Documents/Rclub-rethinking_Jessica.Tucci/Assignment_Chapter_05”) lds=read.csv(“lds_table.csv”,header=F) names(lds)=c(“State”,“percent_lds”)</p>
+<p>lds_marriage=merge(WaffleDivorce,lds,by.x=“Location”,by.y=“State”)</p>
 </div>
+</div>
+<div id="standardize-variables" class="section level1">
+<h1>standardize variables</h1>
+<p>lds_marriage<span class="math inline">\(Marriage.s &lt;- (lds_marriage\)</span>Marriage - mean(lds_marriage<span class="math inline">\(Marriage))/sd(lds_marriage\)</span>Marriage)</p>
+<p>lds_marriage<span class="math inline">\(MedianAgeMarriage.s &lt;- (lds_marriage\)</span>MedianAgeMarriage - mean(lds_marriage<span class="math inline">\(MedianAgeMarriage))/sd(lds_marriage\)</span>MedianAgeMarriage)</p>
+<p>lds_marriage<span class="math inline">\(percent_lds.s &lt;- (LDS_marriage\)</span>percent_lds - mean(lds_marriage<span class="math inline">\(percent_lds))/sd(lds_marriage\)</span>percent_lds)</p>
+</div>
+<div id="create-a-model" class="section level1">
+<h1>create a model</h1>
+<p>model_lds &lt;- map( alist( Divorce ~ dnorm(mu, sigma), mu &lt;- a + bR<em>Marriage.s + bA</em>MedianAgeMarriage.s + bL*percent_lds.s, a ~ dnorm(10, 10), bR ~ dnorm(0, 1), bA ~ dnorm(0,1), bL ~ dnorm(0,1), sigma ~ dunif(0,10) ) , data = lds_marriage) precis(model_lds)</p>
 </div>
 
 

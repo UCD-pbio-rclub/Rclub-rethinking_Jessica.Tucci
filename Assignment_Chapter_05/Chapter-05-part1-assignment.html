@@ -142,19 +142,52 @@ P=Plant Diversity</p>
 </div>
 <div id="m4" class="section level2">
 <h2>5M4</h2>
-<p>library(rethinking) data(WaffleDivorce) setwd(“C:/Users/Jessica/Documents/Rclub-rethinking_Jessica.Tucci/Assignment_Chapter_05”) lds=read.csv(“lds_table.csv”,header=F) names(lds)=c(“State”,“percent_lds”)</p>
-<p>lds_marriage=merge(WaffleDivorce,lds,by.x=“Location”,by.y=“State”)</p>
+<pre class="r"><code>library(rethinking)</code></pre>
+<pre><code>## Loading required package: rstan</code></pre>
+<pre><code>## Warning: package 'rstan' was built under R version 3.2.3</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<pre><code>## Warning: package 'ggplot2' was built under R version 3.2.3</code></pre>
+<pre><code>## rstan (Version 2.9.0, packaged: 2016-01-05 16:17:47 UTC, GitRev: 05c3d0058b6a)</code></pre>
+<pre><code>## For execution on a local, multicore CPU with excess RAM we recommend calling
+## rstan_options(auto_write = TRUE)
+## options(mc.cores = parallel::detectCores())</code></pre>
+<pre><code>## Loading required package: parallel</code></pre>
+<pre><code>## rethinking (Version 1.58)</code></pre>
+<pre class="r"><code>data(WaffleDivorce)
+setwd(&quot;C:/Users/Jessica/Documents/Rclub-rethinking_Jessica.Tucci/Assignment_Chapter_05&quot;)
+lds=read.csv(&quot;lds_table.csv&quot;,header=F)
+names(lds)=c(&quot;State&quot;,&quot;percent_lds&quot;)
+
+lds_marriage=merge(WaffleDivorce,lds,by.x=&quot;Location&quot;,by.y=&quot;State&quot;)
+
+#standardize variables
+lds_marriage$Marriage.s &lt;- (lds_marriage$Marriage - mean(lds_marriage$Marriage))/sd(lds_marriage$Marriage)
+
+lds_marriage$MedianAgeMarriage.s &lt;- (lds_marriage$MedianAgeMarriage - mean(lds_marriage$MedianAgeMarriage))/sd(lds_marriage$MedianAgeMarriage)
+
+lds_marriage$percent_lds.s &lt;- (lds_marriage$percent_lds - mean(lds_marriage$percent_lds))/sd(lds_marriage$percent_lds)
+
+#create a model
+
+model_lds &lt;- map(
+    alist(
+      Divorce ~ dnorm(mu, sigma),
+      mu &lt;- a + bR*Marriage.s + bA*MedianAgeMarriage.s + bL*percent_lds.s,
+      a ~ dnorm(10, 10),
+      bR ~ dnorm(0, 1),
+      bA ~ dnorm(0,1),
+      bL ~ dnorm(0,1),
+      sigma ~ dunif(0,10)
+    ) ,
+    data = lds_marriage)
+precis(model_lds)</code></pre>
+<pre><code>##        Mean StdDev  5.5% 94.5%
+## a      9.69   0.19  9.38  9.99
+## bR     0.06   0.27 -0.38  0.49
+## bA    -1.27   0.27 -1.70 -0.85
+## bL    -0.58   0.22 -0.93 -0.23
+## sigma  1.34   0.13  1.13  1.56</code></pre>
 </div>
-</div>
-<div id="standardize-variables" class="section level1">
-<h1>standardize variables</h1>
-<p>lds_marriage<span class="math inline">\(Marriage.s &lt;- (lds_marriage\)</span>Marriage - mean(lds_marriage<span class="math inline">\(Marriage))/sd(lds_marriage\)</span>Marriage)</p>
-<p>lds_marriage<span class="math inline">\(MedianAgeMarriage.s &lt;- (lds_marriage\)</span>MedianAgeMarriage - mean(lds_marriage<span class="math inline">\(MedianAgeMarriage))/sd(lds_marriage\)</span>MedianAgeMarriage)</p>
-<p>lds_marriage<span class="math inline">\(percent_lds.s &lt;- (LDS_marriage\)</span>percent_lds - mean(lds_marriage<span class="math inline">\(percent_lds))/sd(lds_marriage\)</span>percent_lds)</p>
-</div>
-<div id="create-a-model" class="section level1">
-<h1>create a model</h1>
-<p>model_lds &lt;- map( alist( Divorce ~ dnorm(mu, sigma), mu &lt;- a + bR<em>Marriage.s + bA</em>MedianAgeMarriage.s + bL*percent_lds.s, a ~ dnorm(10, 10), bR ~ dnorm(0, 1), bA ~ dnorm(0,1), bL ~ dnorm(0,1), sigma ~ dunif(0,10) ) , data = lds_marriage) precis(model_lds)</p>
 </div>
 
 

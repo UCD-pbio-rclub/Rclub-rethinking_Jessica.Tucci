@@ -33,7 +33,46 @@ Drinking whole fat milk is correlated with lower levels of obsesity. However, ch
 Those that get divorced proably also will remarry more often. Take into account how many times the person has been married.
 
 ## 5M4
+
+```r
 library(rethinking)
+```
+
+```
+## Loading required package: rstan
+```
+
+```
+## Warning: package 'rstan' was built under R version 3.2.3
+```
+
+```
+## Loading required package: ggplot2
+```
+
+```
+## Warning: package 'ggplot2' was built under R version 3.2.3
+```
+
+```
+## rstan (Version 2.9.0, packaged: 2016-01-05 16:17:47 UTC, GitRev: 05c3d0058b6a)
+```
+
+```
+## For execution on a local, multicore CPU with excess RAM we recommend calling
+## rstan_options(auto_write = TRUE)
+## options(mc.cores = parallel::detectCores())
+```
+
+```
+## Loading required package: parallel
+```
+
+```
+## rethinking (Version 1.58)
+```
+
+```r
 data(WaffleDivorce)
 setwd("C:/Users/Jessica/Documents/Rclub-rethinking_Jessica.Tucci/Assignment_Chapter_05")
 lds=read.csv("lds_table.csv",header=F)
@@ -46,7 +85,7 @@ lds_marriage$Marriage.s <- (lds_marriage$Marriage - mean(lds_marriage$Marriage))
 
 lds_marriage$MedianAgeMarriage.s <- (lds_marriage$MedianAgeMarriage - mean(lds_marriage$MedianAgeMarriage))/sd(lds_marriage$MedianAgeMarriage)
 
-lds_marriage$percent_lds.s <- (LDS_marriage$percent_lds - mean(lds_marriage$percent_lds))/sd(lds_marriage$percent_lds)
+lds_marriage$percent_lds.s <- (lds_marriage$percent_lds - mean(lds_marriage$percent_lds))/sd(lds_marriage$percent_lds)
 
 #create a model
 
@@ -62,5 +101,16 @@ model_lds <- map(
     ) ,
     data = lds_marriage)
 precis(model_lds)
+```
+
+```
+##        Mean StdDev  5.5% 94.5%
+## a      9.69   0.19  9.38  9.99
+## bR     0.06   0.27 -0.38  0.49
+## bA    -1.27   0.27 -1.70 -0.85
+## bL    -0.58   0.22 -0.93 -0.23
+## sigma  1.34   0.13  1.13  1.56
+```
+
 
 

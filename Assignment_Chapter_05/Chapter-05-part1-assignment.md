@@ -1,8 +1,3 @@
----
-output: 
-  html_document: 
-    keep_md: yes
----
 # Statistical Rethinking Chapter 4 problems
 
 __Name:__ Jessica

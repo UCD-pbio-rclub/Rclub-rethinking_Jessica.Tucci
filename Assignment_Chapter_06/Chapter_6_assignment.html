@@ -145,6 +145,70 @@ $(document).ready(function () {
 -sum( p*log(p) )</code></pre>
 <pre><code>## [1] 1.098612</code></pre>
 </div>
+<div id="m1" class="section level2">
+<h2>6M1</h2>
+<p><strong>Write down and compare the definitions of AIC, DIC, and WAIC. Which of these criteria is most general? Which assumptions are required to transform a more general criterion into a less general one?</strong></p>
+<p>AIC= Akaike information criterion AIC provides an estimate of the average out-of-sample deviance.</p>
+<p>AIC = Dtrain + 2p</p>
+<p>where p is the number of free parameters to be estimated in the model.</p>
+<p>AIC provides an approximation of predictive accuracy, as measured by out-of-sample deviance. All information criteria aim at this same target, but are derived under more and less general assumptions.</p>
+<p>Criterion is least general for AIC, and are as follows</p>
+<ol style="list-style-type: decimal">
+<li><p>The priors are flat or overwhelmed by the likelihood.</p></li>
+<li><p>The posterior distribution is approximately multivariate Gaussian.</p></li>
+<li><p>The sample size N is much greater95 than the number of parameters k.</p></li>
+</ol>
+<p>DIC=Deviance Information Criterion</p>
+<p>slightly less general and allows for informative priors, but still assumes that the posterior is multivariate Gaussian and that N ≫ k.</p>
+<p>WAIC= Widely Applicable Information Criterion</p>
+<p>WAIC is the most general of the three and makes no assumption about the shape of the posterior.</p>
+</div>
+<div id="m5" class="section level2">
+<h2>6M5</h2>
+<p><strong>Provide an informal explanation of why informative priors reduce overfitting.</strong></p>
+<p>Overfitting can occur when a model is overly influenced by the training sample. This is worse when the sample size is small and the priors are flat or close to flat. When this happens the posterior encodes as much of the training sample as possible and is not relatable for future predictions. If you have informative priors then the model will put more weight on values that are more plausable based on your informative priors, and be less likely to put too much weight onto values that might appear by chance in a small sample size (and probably are not very predictive of future values).</p>
+</div>
+<div id="m6" class="section level2">
+<h2>6M6</h2>
+<p><strong>Provide an information explanation of why overly informative priors result in underfitting.</strong></p>
+<p>Underfitting can occur when a prior is too skeptical, you can miss features of the data that may have good predictive value because your model is too skeptical to properly learn from the data it is being given. When you have informative priors that are too restrictive, the model will not allow for the natural variation that may exist in the data set and therefore again not give valuable predictions.</p>
+</div>
+<div id="j1" class="section level2">
+<h2>6J1</h2>
+<p><strong>explore how the code in Code Block 6.16 works. Explain what is happening in each line.</strong></p>
+<pre class="r"><code>library(rethinking)</code></pre>
+<pre><code>## Loading required package: rstan</code></pre>
+<pre><code>## Warning: package 'rstan' was built under R version 3.2.3</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<pre><code>## Warning: package 'ggplot2' was built under R version 3.2.3</code></pre>
+<pre><code>## rstan (Version 2.9.0, packaged: 2016-01-05 16:17:47 UTC, GitRev: 05c3d0058b6a)</code></pre>
+<pre><code>## For execution on a local, multicore CPU with excess RAM we recommend calling
+## rstan_options(auto_write = TRUE)
+## options(mc.cores = parallel::detectCores())</code></pre>
+<pre><code>## Loading required package: parallel</code></pre>
+<pre><code>## rethinking (Version 1.58)</code></pre>
+<pre class="r"><code>#code is for Overthinking: WAIC calculations
+data(cars)
+m &lt;- map(
+alist(
+dist ~ dnorm(mu,sigma),
+mu &lt;- a + b*speed,
+a ~ dnorm(0,100),
+b ~ dnorm(0,10),
+sigma ~ dunif(0,30)
+) , data=cars )
+post &lt;- extract.samples(m,n=1000)
+
+#6.16
+#log-likelihood of each observation i at each sample s from the posterior
+n_samples &lt;- 1000 #number of samples you extracted above
+ll &lt;- sapply( 1:n_samples , #runs the function below for s equal to each value 1 through 1000 and returns a matrix
+function(s) {
+mu &lt;- post$a[s] + post$b[s]*cars$speed #this function takes collumn a + collumn b multiplied by the length 50 vector cars$speed for each row s
+dnorm( cars$dist , mu , post$sigma[s] , log=TRUE ) #this part returns a value from the standard distribution based on each of the 50 different mean calculated above and the extracted sigma value from post and row s
+} )
+#You end up with a 50-by-1000 matrix of log-likelihoods, with observations in rows and samples in columns.</code></pre>
+</div>
 </div>
 
 

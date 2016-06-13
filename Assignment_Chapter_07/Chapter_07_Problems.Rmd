@@ -48,7 +48,7 @@ Engine type
 **4. Intelligent animal species tend to be either highly social or have manipulative appendages (hands, tentacles, etc.).**
 
 ```
-1
+1,2,4
 
 ```
 
@@ -59,7 +59,7 @@ Engine type
 ```{r eval=FALSE}
 #1. 
 
-model_onions <- lm( onion_quality ~ heat + moisture+ heat*moisture , data=d )
+model_onions <- lm( onion_quality ~ heat + moisture+ heat:moisture , data=d )
 
 #2.
 
@@ -91,7 +91,7 @@ From the chapter we learned that tullips need both light and water to produce bl
 
 ```{r eval=FALSE}
 
-model_blooms <-lm(blooms~ water +shade +temperature + water*shade + water*temperature+ shade*water+ shade* temperature + water*shade*temperature, data=d )
+model_blooms <-lm(blooms~ water:shade+ temperature:water+ water:shade:temperature, data=d )
 
 
 ```
@@ -189,7 +189,7 @@ d$log_gdp <- log( d$rgdppc_2000 )
 # extract countries with GDP data
 dd <- d[ complete.cases(d$rgdppc_2000) , ]
 
-dd_dropped<-subset(dd,dd$"country"=="Seychelles")
+dd_dropped<-subset(dd,dd$"country"!="Seychelles")
 
 model_full <- map(
 alist(
@@ -204,18 +204,20 @@ sigma ~ dunif( 0 , 10 )
 ) ,
 data=dd )
 
-#model_dropped<- map(
-#alist(
-#log_gdp ~ dnorm( mu , sigma ) ,
-#mu <- a + gamma*rugged + bA*cont_africa ,
-#gamma <- bR + bAR*cont_africa ,
-#a ~ dnorm( 8 , 100 ) ,
-#bA ~ dnorm( 0 , 1 ) ,
-#bR ~ dnorm( 0 , 1 ) ,
-#bAR ~ dnorm( 0 , 1 ) ,
-#sigma ~ dunif( 0 , 10 )
-#),
-#data=dd_dropped )
+model_dropped<- map(
+alist(
+log_gdp ~ dnorm( mu , sigma ) ,
+mu <- a + gamma*rugged + bA*cont_africa ,
+gamma <- bR + bAR*cont_africa ,
+a ~ dnorm( 8 , 100 ) ,
+bA ~ dnorm( 0 , 1 ) ,
+bR ~ dnorm( 0 , 1 ) ,
+bAR ~ dnorm( 0 , 1 ) ,
+sigma ~ dunif( 0 , 10 )
+),
+data=dd_dropped )
+
+coeftab(model_full,model_dropped)
 
 
 ```
@@ -223,7 +225,64 @@ data=dd )
 
 **b. Now plot the predictions of the interaction model, with and without Seychelles. Does it still seem like the effect of ruggedness depends upon continent? How much has the expected relationship changed?**
 
+```{r}
+#plots for full model
+rugged.seq <- seq(from=-1,to=8,by=0.25) 
+mu.Africa <- link( model_full , data=data.frame(cont_africa=1,rugged=rugged.seq) )
+mu.Africa.mean <- apply( mu.Africa , 2 , mean )
+mu.Africa.PI <- apply( mu.Africa , 2 , PI , prob=0.97 )
+mu.NotAfrica <- link( model_full , data=data.frame(cont_africa=0,rugged=rugged.seq) )
+mu.NotAfrica.mean <- apply( mu.NotAfrica , 2 , mean )
+mu.NotAfrica.PI <- apply( mu.NotAfrica , 2 , PI , prob=0.97 )
+d.A1 <- dd[dd$cont_africa==1,]
+plot( log(rgdppc_2000) ~ rugged , data=d.A1 ,
+col=rangi2 , ylab="log GDP year 2000" ,
+xlab="Terrain Ruggedness Index" )
+mtext( "African nations" , 3 )
+lines( rugged.seq , mu.Africa.mean , col=rangi2 )
+shade( mu.Africa.PI , rugged.seq , col=col.alpha(rangi2,0.3) )
+# plot non-African nations with regression
+d.A0 <- dd[dd$cont_africa==0,]
+plot( log(rgdppc_2000) ~ rugged , data=d.A0 ,
+col="black" , ylab="log GDP year 2000" ,
+xlab="Terrain Ruggedness Index" )
+mtext( "Non-African nations" , 3 )
+lines( rugged.seq , mu.NotAfrica.mean )
+shade( mu.NotAfrica.PI , rugged.seq )
+
+#Plots for model with dropped data:
+rugged.seq <- seq(from=-1,to=8,by=0.25) 
+mu.Africa <- link( model_dropped , data=data.frame(cont_africa=1,rugged=rugged.seq) )
+mu.Africa.mean <- apply( mu.Africa , 2 , mean )
+mu.Africa.PI <- apply( mu.Africa , 2 , PI , prob=0.97 )
+mu.NotAfrica <- link( model_dropped , data=data.frame(cont_africa=0,rugged=rugged.seq) )
+mu.NotAfrica.mean <- apply( mu.NotAfrica , 2 , mean )
+mu.NotAfrica.PI <- apply( mu.NotAfrica , 2 , PI , prob=0.97 )
+d.A1 <- dd_dropped[dd_dropped$cont_africa==1,]
+plot( log(rgdppc_2000) ~ rugged , data=d.A1 ,
+col=rangi2 , ylab="log GDP year 2000" ,
+xlab="Terrain Ruggedness Index" )
+mtext( "African nations" , 3 )
+lines( rugged.seq , mu.Africa.mean , col=rangi2 )
+shade( mu.Africa.PI , rugged.seq , col=col.alpha(rangi2,0.3) )
+# plot non-African nations with regression
+d.A0 <- dd_dropped[dd_dropped$cont_africa==0,]
+plot( log(rgdppc_2000) ~ rugged , data=d.A0 ,
+col="black" , ylab="log GDP year 2000" ,
+xlab="Terrain Ruggedness Index" )
+mtext( "Non-African nations" , 3 )
+lines( rugged.seq , mu.NotAfrica.mean )
+shade( mu.NotAfrica.PI , rugged.seq )
+
+```
+
+
 **c. Finally, conduct a model comparison analysis, using WAIC. Fit three models to the data without Seychelles. Use whatever priors you think are sensible. Plot the model-averaged predictions of this model set. Do your inferences differ from those in (b)? Why or why not?**
+
+```{r}
+
+
+```
 
 #7H4 
 
@@ -249,6 +308,66 @@ d$lang.per.cap <- d$num.lang / d$k.pop
 
 **(a) Evaluate the hypothesis that language diversity, as measured by log(lang.per.cap), is positively associated with the average length of the growing season, mean.growing.season. Consider log(area) in your regression(s) as a covariate (not an interaction). Interpret your results.**
 
-**(b) Now evaluate the hypothesis thatlanguage diversity is negatively associated with the standard deviation of length of growing season, sd.growing.season. This hypothesis follows from uncertainty in harvest favoring social insurance through larger social networks and therefore fewer languages. Again, consider log(area) as a covariate (not an interaction). Interpret your results.**
+```{r}
+data(nettle)
+d=nettle
+library(rethinking)
+d$lang.per.cap <- d$num.lang / d$k.pop
+d$log.lang.per.cap<-log(d$lang.per.cap)
+d$log.area<-log(d$area)
+
+model_a <- map(
+alist(
+log.lang.per.cap ~ dnorm( mu , sigma ) ,
+mu <- a + bm*mean.growing.season +ba*log.area,
+a ~ dnorm( 8 , 100 ) ,
+bm ~ dnorm( 7 , 4 ) ,
+ba ~ dnorm(12,2),
+sigma ~ dunif( 0 , 10 )
+) ,
+data=d )
+
+precis(model_a)
+plot(precis(model_a))
+```
+
+
+**(b) Now evaluate the hypothesis that language diversity is negatively associated with the standard deviation of length of growing season, sd.growing.season. This hypothesis follows from uncertainty in harvest favoring social insurance through larger social networks and therefore fewer languages. Again, consider log(area) as a covariate (not an interaction). Interpret your results.**
+
+```{r}
+model_b <- map(
+alist(
+log.lang.per.cap ~ dnorm( mu , sigma ) ,
+mu <- a + bs*sd.growing.season + ba*log.area,
+a ~ dnorm( 8 , 100 ) ,
+bs ~ dnorm( 1.7 , 1 ) ,
+ba ~ dnorm(12,2),
+sigma ~ dunif( 0 , 10 )
+) ,
+data=d )
+
+precis(model_b)
+plot(precis(model_b))
+```
+
 
 **(c) Finally, evaluate the hypothesis that mean.growing.season and sd.growing.season interact to synergistically reduce language diversity. The idea is that, in nations with longer average growing seasons, high variance makes storage and redistribution even more important than it would be otherwise. That way, people can cooperate to preserve and protect windfalls to be used during the droughts. These forces in turn may lead to greater social integration and fewer languages.**
+
+```{r}
+model_c <- map(
+alist(
+log.lang.per.cap ~ dnorm( mu , sigma ) ,
+mu <- a + bm*mean.growing.season + bs*sd.growing.season+bms*mean.growing.season*sd.growing.season ,
+a ~ dnorm( 8 , 100 ),
+bm ~ dnorm( 7 , 4 ) ,
+bs ~ dnorm( 1.7 , 1 ),
+bms~ dnorm(1,10),
+sigma ~ dunif( 0 , 10 )
+) ,
+data=d )
+
+precis(model_c)
+plot(precis(model_c))
+
+```
+

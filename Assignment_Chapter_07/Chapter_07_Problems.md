@@ -41,7 +41,7 @@ Engine type
 **4. Intelligent animal species tend to be either highly social or have manipulative appendages (hands, tentacles, etc.).**
 
 ```
-1
+1,2,4
 
 ```
 
@@ -53,7 +53,7 @@ Engine type
 ```r
 #1. 
 
-model_onions <- lm( onion_quality ~ heat + moisture+ heat*moisture , data=d )
+model_onions <- lm( onion_quality ~ heat + moisture+ heat:moisture , data=d )
 
 #2.
 
@@ -84,7 +84,7 @@ From the chapter we learned that tullips need both light and water to produce bl
 
 
 ```r
-model_blooms <-lm(blooms~ water +shade +temperature + water*shade + water*temperature+ shade*water+ shade* temperature + water*shade*temperature, data=d )
+model_blooms <-lm(blooms~ water:shade+ temperature:water+ water:shade:temperature, data=d )
 ```
 
 #7M3
@@ -178,11 +178,11 @@ precis(model_7H1)
 
 ```
 ##         Mean StdDev   5.5%  94.5%
-## a     129.03   8.67 115.17 142.89
-## bW     74.97  10.59  58.05  91.90
-## bS    -41.15  10.59 -58.07 -24.23
-## bWS   -51.90  12.93 -72.57 -31.23
-## sigma  45.17   6.15  35.34  54.99
+## a     129.03   8.68 115.16 142.90
+## bW     74.95  10.60  58.01  91.89
+## bS    -41.13  10.60 -58.07 -24.20
+## bWS   -51.95  12.94 -72.63 -31.26
+## sigma  45.21   6.16  35.36  55.05
 ## bA     -0.14   1.00  -1.74   1.46
 ## bB      0.06   1.00  -1.54   1.66
 ```
@@ -215,10 +215,10 @@ coeftab(model_7H1,m7.9)
 ```
 ##       model_7H1 m7.9   
 ## a      129.03    129.01
-## bW      74.97     74.96
-## bS     -41.15    -41.14
-## bWS    -51.90    -51.87
-## sigma   45.17     45.22
+## bW      74.95     74.96
+## bS     -41.13    -41.14
+## bWS    -51.95    -51.87
+## sigma   45.21     45.22
 ## bA      -0.14        NA
 ## bB       0.06        NA
 ## nobs       27        27
@@ -230,8 +230,8 @@ compare( model_7H1 , m7.9 )
 
 ```
 ##            WAIC pWAIC dWAIC weight    SE  dSE
-## model_7H1 295.6   6.4   0.0   0.57 10.18   NA
-## m7.9      296.2   6.6   0.5   0.43 10.40 0.38
+## m7.9      296.1   6.7   0.0   0.55 10.45   NA
+## model_7H1 296.5   6.8   0.4   0.45 10.56 0.46
 ```
 
 
@@ -252,7 +252,7 @@ d$log_gdp <- log( d$rgdppc_2000 )
 # extract countries with GDP data
 dd <- d[ complete.cases(d$rgdppc_2000) , ]
 
-dd_dropped<-subset(dd,dd$"country"=="Seychelles")
+dd_dropped<-subset(dd,dd$"country"!="Seychelles")
 
 model_full <- map(
 alist(
@@ -267,24 +267,170 @@ sigma ~ dunif( 0 , 10 )
 ) ,
 data=dd )
 
-#model_dropped<- map(
-#alist(
-#log_gdp ~ dnorm( mu , sigma ) ,
-#mu <- a + gamma*rugged + bA*cont_africa ,
-#gamma <- bR + bAR*cont_africa ,
-#a ~ dnorm( 8 , 100 ) ,
-#bA ~ dnorm( 0 , 1 ) ,
-#bR ~ dnorm( 0 , 1 ) ,
-#bAR ~ dnorm( 0 , 1 ) ,
-#sigma ~ dunif( 0 , 10 )
-#),
-#data=dd_dropped )
+model_dropped<- map(
+alist(
+log_gdp ~ dnorm( mu , sigma ) ,
+mu <- a + gamma*rugged + bA*cont_africa ,
+gamma <- bR + bAR*cont_africa ,
+a ~ dnorm( 8 , 100 ) ,
+bA ~ dnorm( 0 , 1 ) ,
+bR ~ dnorm( 0 , 1 ) ,
+bAR ~ dnorm( 0 , 1 ) ,
+sigma ~ dunif( 0 , 10 )
+),
+data=dd_dropped )
+
+coeftab(model_full,model_dropped)
+```
+
+```
+##       model_full model_dropped
+## a        9.18       9.19      
+## bA      -1.85      -1.78      
+## bR      -0.18      -0.19      
+## bAR      0.35       0.25      
+## sigma    0.93       0.93      
+## nobs      170        169
 ```
 
 
 **b. Now plot the predictions of the interaction model, with and without Seychelles. Does it still seem like the effect of ruggedness depends upon continent? How much has the expected relationship changed?**
 
+
+```r
+#plots for full model
+rugged.seq <- seq(from=-1,to=8,by=0.25) 
+mu.Africa <- link( model_full , data=data.frame(cont_africa=1,rugged=rugged.seq) )
+```
+
+```
+## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]
+```
+
+```r
+mu.Africa.mean <- apply( mu.Africa , 2 , mean )
+mu.Africa.PI <- apply( mu.Africa , 2 , PI , prob=0.97 )
+mu.NotAfrica <- link( model_full , data=data.frame(cont_africa=0,rugged=rugged.seq) )
+```
+
+```
+## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]
+```
+
+```r
+mu.NotAfrica.mean <- apply( mu.NotAfrica , 2 , mean )
+mu.NotAfrica.PI <- apply( mu.NotAfrica , 2 , PI , prob=0.97 )
+d.A1 <- dd[dd$cont_africa==1,]
+plot( log(rgdppc_2000) ~ rugged , data=d.A1 ,
+col=rangi2 , ylab="log GDP year 2000" ,
+xlab="Terrain Ruggedness Index" )
+mtext( "African nations" , 3 )
+lines( rugged.seq , mu.Africa.mean , col=rangi2 )
+shade( mu.Africa.PI , rugged.seq , col=col.alpha(rangi2,0.3) )
+```
+
+![](Chapter_07_Problems_files/figure-html/unnamed-chunk-6-1.png)
+
+```r
+# plot non-African nations with regression
+d.A0 <- dd[dd$cont_africa==0,]
+plot( log(rgdppc_2000) ~ rugged , data=d.A0 ,
+col="black" , ylab="log GDP year 2000" ,
+xlab="Terrain Ruggedness Index" )
+mtext( "Non-African nations" , 3 )
+lines( rugged.seq , mu.NotAfrica.mean )
+shade( mu.NotAfrica.PI , rugged.seq )
+```
+
+![](Chapter_07_Problems_files/figure-html/unnamed-chunk-6-2.png)
+
+```r
+#Plots for model with dropped data:
+rugged.seq <- seq(from=-1,to=8,by=0.25) 
+mu.Africa <- link( model_dropped , data=data.frame(cont_africa=1,rugged=rugged.seq) )
+```
+
+```
+## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]
+```
+
+```r
+mu.Africa.mean <- apply( mu.Africa , 2 , mean )
+mu.Africa.PI <- apply( mu.Africa , 2 , PI , prob=0.97 )
+mu.NotAfrica <- link( model_dropped , data=data.frame(cont_africa=0,rugged=rugged.seq) )
+```
+
+```
+## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]
+```
+
+```r
+mu.NotAfrica.mean <- apply( mu.NotAfrica , 2 , mean )
+mu.NotAfrica.PI <- apply( mu.NotAfrica , 2 , PI , prob=0.97 )
+d.A1 <- dd_dropped[dd_dropped$cont_africa==1,]
+plot( log(rgdppc_2000) ~ rugged , data=d.A1 ,
+col=rangi2 , ylab="log GDP year 2000" ,
+xlab="Terrain Ruggedness Index" )
+mtext( "African nations" , 3 )
+lines( rugged.seq , mu.Africa.mean , col=rangi2 )
+shade( mu.Africa.PI , rugged.seq , col=col.alpha(rangi2,0.3) )
+```
+
+![](Chapter_07_Problems_files/figure-html/unnamed-chunk-6-3.png)
+
+```r
+# plot non-African nations with regression
+d.A0 <- dd_dropped[dd_dropped$cont_africa==0,]
+plot( log(rgdppc_2000) ~ rugged , data=d.A0 ,
+col="black" , ylab="log GDP year 2000" ,
+xlab="Terrain Ruggedness Index" )
+mtext( "Non-African nations" , 3 )
+lines( rugged.seq , mu.NotAfrica.mean )
+shade( mu.NotAfrica.PI , rugged.seq )
+```
+
+![](Chapter_07_Problems_files/figure-html/unnamed-chunk-6-4.png)
+
+
 **c. Finally, conduct a model comparison analysis, using WAIC. Fit three models to the data without Seychelles. Use whatever priors you think are sensible. Plot the model-averaged predictions of this model set. Do your inferences differ from those in (b)? Why or why not?**
+
+
 
 #7H4 
 
@@ -311,6 +457,108 @@ d$lang.per.cap <- d$num.lang / d$k.pop
 
 **(a) Evaluate the hypothesis that language diversity, as measured by log(lang.per.cap), is positively associated with the average length of the growing season, mean.growing.season. Consider log(area) in your regression(s) as a covariate (not an interaction). Interpret your results.**
 
-**(b) Now evaluate the hypothesis thatlanguage diversity is negatively associated with the standard deviation of length of growing season, sd.growing.season. This hypothesis follows from uncertainty in harvest favoring social insurance through larger social networks and therefore fewer languages. Again, consider log(area) as a covariate (not an interaction). Interpret your results.**
+
+```r
+data(nettle)
+d=nettle
+library(rethinking)
+d$lang.per.cap <- d$num.lang / d$k.pop
+d$log.lang.per.cap<-log(d$lang.per.cap)
+d$log.area<-log(d$area)
+
+model_a <- map(
+alist(
+log.lang.per.cap ~ dnorm( mu , sigma ) ,
+mu <- a + bm*mean.growing.season +ba*log.area,
+a ~ dnorm( 8 , 100 ) ,
+bm ~ dnorm( 7 , 4 ) ,
+ba ~ dnorm(12,2),
+sigma ~ dunif( 0 , 10 )
+) ,
+data=d )
+
+precis(model_a)
+```
+
+```
+##        Mean StdDev  5.5% 94.5%
+## a     -4.69   1.97 -7.83 -1.55
+## bm     0.15   0.06  0.06  0.24
+## ba    -0.14   0.14 -0.36  0.08
+## sigma  1.39   0.11  1.21  1.57
+```
+
+```r
+plot(precis(model_a))
+```
+
+![](Chapter_07_Problems_files/figure-html/unnamed-chunk-9-1.png)
+
+
+**(b) Now evaluate the hypothesis that language diversity is negatively associated with the standard deviation of length of growing season, sd.growing.season. This hypothesis follows from uncertainty in harvest favoring social insurance through larger social networks and therefore fewer languages. Again, consider log(area) as a covariate (not an interaction). Interpret your results.**
+
+
+```r
+model_b <- map(
+alist(
+log.lang.per.cap ~ dnorm( mu , sigma ) ,
+mu <- a + bs*sd.growing.season + ba*log.area,
+a ~ dnorm( 8 , 100 ) ,
+bs ~ dnorm( 1.7 , 1 ) ,
+ba ~ dnorm(12,2),
+sigma ~ dunif( 0 , 10 )
+) ,
+data=d )
+
+precis(model_b)
+```
+
+```
+##        Mean StdDev  5.5% 94.5%
+## a     -2.61   1.87 -5.61  0.38
+## bs    -0.19   0.18 -0.48  0.10
+## ba    -0.19   0.16 -0.44  0.05
+## sigma  1.44   0.12  1.25  1.63
+```
+
+```r
+plot(precis(model_b))
+```
+
+![](Chapter_07_Problems_files/figure-html/unnamed-chunk-10-1.png)
+
 
 **(c) Finally, evaluate the hypothesis that mean.growing.season and sd.growing.season interact to synergistically reduce language diversity. The idea is that, in nations with longer average growing seasons, high variance makes storage and redistribution even more important than it would be otherwise. That way, people can cooperate to preserve and protect windfalls to be used during the droughts. These forces in turn may lead to greater social integration and fewer languages.**
+
+
+```r
+model_c <- map(
+alist(
+log.lang.per.cap ~ dnorm( mu , sigma ) ,
+mu <- a + bm*mean.growing.season + bs*sd.growing.season+bms*mean.growing.season*sd.growing.season ,
+a ~ dnorm( 8 , 100 ),
+bm ~ dnorm( 7 , 4 ) ,
+bs ~ dnorm( 1.7 , 1 ),
+bms~ dnorm(1,10),
+sigma ~ dunif( 0 , 10 )
+) ,
+data=d )
+
+precis(model_c)
+```
+
+```
+##        Mean StdDev  5.5% 94.5%
+## a     -7.18   0.57 -8.09 -6.26
+## bm     0.32   0.07  0.21  0.43
+## bs     0.58   0.35  0.02  1.14
+## bms   -0.13   0.04 -0.20 -0.06
+## sigma  1.31   0.11  1.14  1.48
+```
+
+```r
+plot(precis(model_c))
+```
+
+![](Chapter_07_Problems_files/figure-html/unnamed-chunk-11-1.png)
+

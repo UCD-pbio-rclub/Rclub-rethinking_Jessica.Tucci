@@ -138,9 +138,9 @@ m8.1stan_uniform <- map2stan(
 ## Chain 1, Iteration: 1600 / 2000 [ 80%]  (Sampling)
 ## Chain 1, Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1, Iteration: 2000 / 2000 [100%]  (Sampling)
-##  Elapsed Time: 0.743 seconds (Warm-up)
-##                0.724 seconds (Sampling)
-##                1.467 seconds (Total)
+##  Elapsed Time: 0.876 seconds (Warm-up)
+##                0.764 seconds (Sampling)
+##                1.64 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL 'log_gdp ~ dnorm(mu, sigma)' NOW (CHAIN 1).
@@ -150,8 +150,8 @@ m8.1stan_uniform <- map2stan(
 ## 
 ## Chain 1, Iteration: 1 / 1 [100%]  (Sampling)
 ##  Elapsed Time: 0 seconds (Warm-up)
-##                0.001 seconds (Sampling)
-##                0.001 seconds (Total)
+##                0 seconds (Sampling)
+##                0 seconds (Total)
 ```
 
 ```
@@ -206,9 +206,9 @@ m8.1stan_exp <- map2stan(
 ## Chain 1, Iteration: 1600 / 2000 [ 80%]  (Sampling)
 ## Chain 1, Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1, Iteration: 2000 / 2000 [100%]  (Sampling)
-##  Elapsed Time: 0.804 seconds (Warm-up)
-##                0.827 seconds (Sampling)
-##                1.631 seconds (Total)
+##  Elapsed Time: 0.952 seconds (Warm-up)
+##                0.655 seconds (Sampling)
+##                1.607 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL 'log_gdp ~ dnorm(mu, sigma)' NOW (CHAIN 1).
@@ -246,11 +246,11 @@ precis(m8.1stan_uniform)
 
 ```
 ##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a      9.23   0.15       8.97       9.44   289 1.00
-## bR    -0.20   0.08      -0.32      -0.06   326 1.00
-## bA    -1.95   0.24      -2.32      -1.57   219 1.01
-## bAR    0.39   0.13       0.17       0.58   326 1.00
-## sigma  0.95   0.05       0.87       1.03   883 1.00
+## a      9.23   0.14       9.02       9.45   319    1
+## bR    -0.21   0.08      -0.32      -0.08   328    1
+## bA    -1.95   0.23      -2.31      -1.61   337    1
+## bAR    0.40   0.13       0.18       0.59   349    1
+## sigma  0.95   0.05       0.87       1.03   678    1
 ```
 
 ```r
@@ -259,12 +259,24 @@ precis(m8.1stan_exp)
 
 ```
 ##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a      9.22   0.13       9.00       9.44   304    1
-## bR    -0.20   0.07      -0.32      -0.08   346    1
-## bA    -1.95   0.22      -2.29      -1.59   319    1
-## bAR    0.39   0.12       0.19       0.58   401    1
-## sigma  0.95   0.05       0.86       1.03   791    1
+## a      9.22   0.13       9.02       9.44   520    1
+## bR    -0.20   0.08      -0.31      -0.07   479    1
+## bA    -1.94   0.21      -2.26      -1.60   581    1
+## bAR    0.39   0.13       0.18       0.59   512    1
+## sigma  0.95   0.05       0.88       1.03   761    1
 ```
+
+```r
+pairs(m8.1stan_uniform)
+```
+
+![](Chapter_8_files/figure-html/unnamed-chunk-1-1.png)
+
+```r
+pairs(m8.1stan_exp)
+```
+
+![](Chapter_8_files/figure-html/unnamed-chunk-1-2.png)
 
 
 #8M2. The Cauchy and exponential priors from the terrain ruggedness model are very weak. They can be made more informative by reducing their scale. Compare the dcauchy and dexp priors for progressively smaller values of the scaling parameter. As these priors become stronger, how does each influence the posterior distribution?
@@ -302,9 +314,9 @@ m8.1stan <- map2stan(
 ## Chain 1, Iteration: 1600 / 2000 [ 80%]  (Sampling)
 ## Chain 1, Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1, Iteration: 2000 / 2000 [100%]  (Sampling)
-##  Elapsed Time: 1.006 seconds (Warm-up)
-##                0.732 seconds (Sampling)
-##                1.738 seconds (Total)
+##  Elapsed Time: 0.652 seconds (Warm-up)
+##                0.464 seconds (Sampling)
+##                1.116 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL 'log_gdp ~ dnorm(mu, sigma)' NOW (CHAIN 1).
@@ -340,19 +352,6 @@ m8.1stan <- map2stan(
 ```
 
 ```r
-precis(m8.1stan)
-```
-
-```
-##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a      9.23   0.13       9.03       9.43   382 1.00
-## bR    -0.21   0.07      -0.31      -0.08   363 1.00
-## bA    -1.96   0.22      -2.31      -1.62   416 1.00
-## bAR    0.40   0.12       0.22       0.60   330 1.01
-## sigma  0.95   0.05       0.87       1.03   906 1.00
-```
-
-```r
 #cauchy stricter prior
 m8.1stan2 <- map2stan( 
                       alist(
@@ -364,7 +363,8 @@ m8.1stan2 <- map2stan(
                         bAR ~ dnorm(0,10),
                         sigma ~ dcauchy(0,1)
                       ) ,
-                      data=dd.trim )
+
+                                           data=dd.trim )
 ```
 
 ```
@@ -384,9 +384,9 @@ m8.1stan2 <- map2stan(
 ## Chain 1, Iteration: 1600 / 2000 [ 80%]  (Sampling)
 ## Chain 1, Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1, Iteration: 2000 / 2000 [100%]  (Sampling)
-##  Elapsed Time: 0.777 seconds (Warm-up)
-##                0.707 seconds (Sampling)
-##                1.484 seconds (Total)
+##  Elapsed Time: 1.242 seconds (Warm-up)
+##                0.857 seconds (Sampling)
+##                2.099 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL 'log_gdp ~ dnorm(mu, sigma)' NOW (CHAIN 1).
@@ -396,8 +396,8 @@ m8.1stan2 <- map2stan(
 ## 
 ## Chain 1, Iteration: 1 / 1 [100%]  (Sampling)
 ##  Elapsed Time: 0 seconds (Warm-up)
-##                0 seconds (Sampling)
-##                0 seconds (Total)
+##                0.001 seconds (Sampling)
+##                0.001 seconds (Total)
 ```
 
 ```
@@ -419,17 +419,42 @@ m8.1stan2 <- map2stan(
 ```
 
 ```r
+precis(m8.1stan)
+```
+
+```
+##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
+## a      9.24   0.14       9.01       9.45   499 1.00
+## bR    -0.21   0.08      -0.33      -0.09   445 1.00
+## bA    -1.96   0.22      -2.30      -1.62   449 1.01
+## bAR    0.40   0.12       0.22       0.59   448 1.00
+## sigma  0.95   0.05       0.86       1.02   561 1.00
+```
+
+```r
 precis(m8.1stan2)
 ```
 
 ```
 ##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a      9.23   0.14       9.03       9.45   358    1
-## bR    -0.21   0.07      -0.34      -0.10   358    1
-## bA    -1.97   0.22      -2.33      -1.64   339    1
-## bAR    0.41   0.12       0.22       0.62   412    1
-## sigma  0.95   0.05       0.87       1.03   660    1
+## a      9.23   0.13       9.04       9.46   353 1.00
+## bR    -0.21   0.08      -0.32      -0.09   328 1.01
+## bA    -1.96   0.22      -2.33      -1.61   386 1.00
+## bAR    0.40   0.13       0.18       0.60   364 1.00
+## sigma  0.95   0.05       0.87       1.04   635 1.00
 ```
+
+```r
+pairs(m8.1stan)
+```
+
+![](Chapter_8_files/figure-html/unnamed-chunk-2-1.png)
+
+```r
+pairs(m8.1stan2)
+```
+
+![](Chapter_8_files/figure-html/unnamed-chunk-2-2.png)
 
 ```r
 #exp original
@@ -438,11 +463,11 @@ precis(m8.1stan_exp)
 
 ```
 ##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a      9.22   0.13       9.00       9.44   304    1
-## bR    -0.20   0.07      -0.32      -0.08   346    1
-## bA    -1.95   0.22      -2.29      -1.59   319    1
-## bAR    0.39   0.12       0.19       0.58   401    1
-## sigma  0.95   0.05       0.86       1.03   791    1
+## a      9.22   0.13       9.02       9.44   520    1
+## bR    -0.20   0.08      -0.31      -0.07   479    1
+## bA    -1.94   0.21      -2.26      -1.60   581    1
+## bAR    0.39   0.13       0.18       0.59   512    1
+## sigma  0.95   0.05       0.88       1.03   761    1
 ```
 
 ```r
@@ -477,9 +502,9 @@ m8.1stan_exp <- map2stan(
 ## Chain 1, Iteration: 1600 / 2000 [ 80%]  (Sampling)
 ## Chain 1, Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1, Iteration: 2000 / 2000 [100%]  (Sampling)
-##  Elapsed Time: 0.78 seconds (Warm-up)
-##                0.802 seconds (Sampling)
-##                1.582 seconds (Total)
+##  Elapsed Time: 0.875 seconds (Warm-up)
+##                0.733 seconds (Sampling)
+##                1.608 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL 'log_gdp ~ dnorm(mu, sigma)' NOW (CHAIN 1).
@@ -517,11 +542,11 @@ precis(m8.1stan_uniform)
 
 ```
 ##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a      9.23   0.15       8.97       9.44   289 1.00
-## bR    -0.20   0.08      -0.32      -0.06   326 1.00
-## bA    -1.95   0.24      -2.32      -1.57   219 1.01
-## bAR    0.39   0.13       0.17       0.58   326 1.00
-## sigma  0.95   0.05       0.87       1.03   883 1.00
+## a      9.23   0.14       9.02       9.45   319    1
+## bR    -0.21   0.08      -0.32      -0.08   328    1
+## bA    -1.95   0.23      -2.31      -1.61   337    1
+## bAR    0.40   0.13       0.18       0.59   349    1
+## sigma  0.95   0.05       0.87       1.03   678    1
 ```
 
 ```r
@@ -530,12 +555,24 @@ precis(m8.1stan_exp)
 
 ```
 ##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a      9.23   0.13       9.01       9.42   297    1
-## bR    -0.21   0.07      -0.33      -0.10   298    1
-## bA    -1.96   0.22      -2.32      -1.60   385    1
-## bAR    0.41   0.13       0.20       0.60   255    1
-## sigma  0.95   0.05       0.87       1.03   646    1
+## a      9.22   0.14       9.02       9.45   330 1.01
+## bR    -0.20   0.08      -0.32      -0.08   317 1.01
+## bA    -1.94   0.23      -2.27      -1.55   372 1.01
+## bAR    0.39   0.13       0.19       0.59   361 1.00
+## sigma  0.95   0.05       0.87       1.03   553 1.00
 ```
+
+```r
+pairs(m8.1stan_uniform)
+```
+
+![](Chapter_8_files/figure-html/unnamed-chunk-2-3.png)
+
+```r
+pairs(m8.1stan_exp)
+```
+
+![](Chapter_8_files/figure-html/unnamed-chunk-2-4.png)
 
 
 #8M3. Re-estimate one of the Stan models from the chapter, but at different numbers of warmup iterations. Be sure to use the same number of sampling iterations in each case. Compare the n_eff values. How much warmup is enough?
@@ -573,9 +610,9 @@ chains=2 , iter=4000 , warmup=1000 )
 ## Chain 1, Iteration: 3400 / 4000 [ 85%]  (Sampling)
 ## Chain 1, Iteration: 3800 / 4000 [ 95%]  (Sampling)
 ## Chain 1, Iteration: 4000 / 4000 [100%]  (Sampling)
-##  Elapsed Time: 3.065 seconds (Warm-up)
-##                9.025 seconds (Sampling)
-##                12.09 seconds (Total)
+##  Elapsed Time: 2.907 seconds (Warm-up)
+##                10.614 seconds (Sampling)
+##                13.521 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL 'y ~ dnorm(mu, sigma)' NOW (CHAIN 2).
@@ -592,9 +629,9 @@ chains=2 , iter=4000 , warmup=1000 )
 ## Chain 2, Iteration: 3400 / 4000 [ 85%]  (Sampling)
 ## Chain 2, Iteration: 3800 / 4000 [ 95%]  (Sampling)
 ## Chain 2, Iteration: 4000 / 4000 [100%]  (Sampling)
-##  Elapsed Time: 3.684 seconds (Warm-up)
-##                12.297 seconds (Sampling)
-##                15.981 seconds (Total)
+##  Elapsed Time: 3.144 seconds (Warm-up)
+##                10.616 seconds (Sampling)
+##                13.76 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL 'y ~ dnorm(mu, sigma)' NOW (CHAIN 1).
@@ -604,8 +641,8 @@ chains=2 , iter=4000 , warmup=1000 )
 ## 
 ## Chain 1, Iteration: 1 / 1 [100%]  (Sampling)
 ##  Elapsed Time: 0 seconds (Warm-up)
-##                0 seconds (Sampling)
-##                0 seconds (Total)
+##                0.001 seconds (Sampling)
+##                0.001 seconds (Total)
 ```
 
 ```
@@ -635,9 +672,9 @@ precis(m8.5)
 
 ```
 ##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a1    -0.15   7.05     -10.78      11.01  1307    1
-## a2    -0.13   7.05     -11.30      10.48  1306    1
-## sigma  1.05   0.08       0.93       1.17  1488    1
+## a1    -0.46   7.14     -11.85      10.51  1005    1
+## a2     0.20   7.14     -10.82      11.57  1006    1
+## sigma  1.01   0.07       0.90       1.13  1694    1
 ```
 
 ```r
@@ -671,9 +708,9 @@ chains=2 , iter=4000 , warmup=500 )
 ## Chain 1, Iteration: 3300 / 4000 [ 82%]  (Sampling)
 ## Chain 1, Iteration: 3700 / 4000 [ 92%]  (Sampling)
 ## Chain 1, Iteration: 4000 / 4000 [100%]  (Sampling)
-##  Elapsed Time: 1.522 seconds (Warm-up)
-##                14.225 seconds (Sampling)
-##                15.747 seconds (Total)
+##  Elapsed Time: 1.437 seconds (Warm-up)
+##                11.568 seconds (Sampling)
+##                13.005 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL 'y ~ dnorm(mu, sigma)' NOW (CHAIN 2).
@@ -690,16 +727,10 @@ chains=2 , iter=4000 , warmup=500 )
 ## Chain 2, Iteration: 3300 / 4000 [ 82%]  (Sampling)
 ## Chain 2, Iteration: 3700 / 4000 [ 92%]  (Sampling)
 ## Chain 2, Iteration: 4000 / 4000 [100%]  (Sampling)
-##  Elapsed Time: 1.257 seconds (Warm-up)
-##                11.218 seconds (Sampling)
-##                12.475 seconds (Total)
+##  Elapsed Time: 1.353 seconds (Warm-up)
+##                12.923 seconds (Sampling)
+##                14.276 seconds (Total)
 ## 
-## [1] "The following numerical problems occured the indicated number of times after warmup on chain 2"
-##                                                                                 count
-## Exception thrown at line 18: normal_log: Scale parameter is 0, but must be > 0!     1
-## [1] "When a numerical problem occurs, the Metropolis proposal gets rejected."
-## [1] "However, by design Metropolis proposals sometimes get rejected  even when there are no numerical problems."
-## [1] "Thus, if the number in the 'count' column is small,  do not ask about this message on stan-users."
 ## 
 ## SAMPLING FOR MODEL 'y ~ dnorm(mu, sigma)' NOW (CHAIN 1).
 ## WARNING: No variance estimation is
@@ -736,9 +767,9 @@ precis(m8.5)
 
 ```
 ##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a1    -0.15   7.05     -10.78      11.01  1307    1
-## a2    -0.13   7.05     -11.30      10.48  1306    1
-## sigma  1.05   0.08       0.93       1.17  1488    1
+## a1    -0.46   7.14     -11.85      10.51  1005    1
+## a2     0.20   7.14     -10.82      11.57  1006    1
+## sigma  1.01   0.07       0.90       1.13  1694    1
 ```
 
 ```r
@@ -747,8 +778,8 @@ precis(m8.5_lesswarmup)
 
 ```
 ##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a1    -0.20   7.01     -11.41      10.81  1569    1
-## a2    -0.09   7.01     -11.07      11.15  1568    1
-## sigma  1.05   0.08       0.93       1.17  2015    1
+## a1    -0.06   7.36     -12.58      10.99  1175    1
+## a2    -0.19   7.36     -11.20      12.36  1176    1
+## sigma  1.02   0.07       0.90       1.13  1682    1
 ```
 

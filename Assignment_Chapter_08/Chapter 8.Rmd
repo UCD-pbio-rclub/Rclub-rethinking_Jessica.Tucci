@@ -87,6 +87,9 @@ precis(m8.1stan_uniform)
 
 precis(m8.1stan_exp)
 
+pairs(m8.1stan_uniform)
+
+pairs(m8.1stan_exp)
 ```
 
 
@@ -105,7 +108,6 @@ m8.1stan <- map2stan(
                         sigma ~ dcauchy(0,2)
                       ) ,
                       data=dd.trim )
-precis(m8.1stan)
 
 #cauchy stricter prior
 m8.1stan2 <- map2stan( 
@@ -118,8 +120,13 @@ m8.1stan2 <- map2stan(
                         bAR ~ dnorm(0,10),
                         sigma ~ dcauchy(0,1)
                       ) ,
-                      data=dd.trim )
+
+                                           data=dd.trim )
+precis(m8.1stan)
 precis(m8.1stan2)
+pairs(m8.1stan)
+pairs(m8.1stan2)
+
 
 #exp original
 precis(m8.1stan_exp)
@@ -140,6 +147,10 @@ m8.1stan_exp <- map2stan(
 precis(m8.1stan_uniform)
 
 precis(m8.1stan_exp)
+
+pairs(m8.1stan_uniform)
+
+pairs(m8.1stan_exp)
 ```
 
 

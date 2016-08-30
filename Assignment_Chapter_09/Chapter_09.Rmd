@@ -1,0 +1,102 @@
+---
+title: "Chapter 09"
+output: html_document
+---
+library(rethinking)
+library(ggplot2)
+library(reshape2)
+
+data=read.csv("C:/Users/Jessica/Documents/Rclub-rethinking_Jessica.Tucci/Assignment_Chapter_09/TomatoR2CSHL.csv")
+
+#look at data and plot out data
+head(data)
+summary(data)
+
+pl<-ggplot(data=data,aes(x=hyp,fill=trt))
+pl<-pl + geom_density()
+pl<-pl + facet_grid(species~trt)
+pl
+
+
+boxpl<-ggplot(data=data,aes(y=hyp,x=species,fill=trt))
+boxpl<-boxpl + geom_boxplot()
+boxpl
+
+#check if we should tranform data
+by(data$hyp,list(data$trt,data$species),shapiro.test)
+by(sqrt(data$hyp), list(data$trt,data$species),shapiro.test)
+
+
+
+
+#making categorical variable as numeric (this is a shortcut, otherwise you can manually make a variable with ifelse for all but one of them)
+
+data$index<-1:nrow(data)
+data2<-dcast(data, index + hyp + trt ~ species, value.var="species",fun.aggregate=length)
+head(data2)
+
+#making categorical variable as numeric
+data2$trt2=ifelse(data2$trt=="L",1,0)
+
+#reduce down data to just collumns needed for the model
+data2.trt=data2[,c("hyp","trt2")]
+
+
+
+
+#model with just trtL
+hyp_stan <- map2stan(
+                      alist(
+                        hyp ~ dnorm( mu , sigma ) ,
+                        mu <- a + bT*trt2,
+                        a ~ dnorm(0,100),
+                        bT ~ dnorm(0,10),
+                        sigma ~ dunif(0,10)
+                      ) ,
+                      data=data2.trt)
+                      
+                      
+#look at plots
+
+plot(hyp_stan)
+precis(hyp_stan)
+par(mfrow=c(1,1))
+
+
+#reduce down data to just collumns needed for the model for trt and species(remove one of the species because that is the intercept value)
+
+#rename data
+ names(data2)=c("index","hyp","trt","S_chilense","S_chiemelewskii","S_habrochaites","S_pennellii","S_peruvianum","trtL","trt2")
+
+data2.species=data2[,c("hyp","S_chilense","S_chiemelewskii","S_habrochaites","S_pennellii")]
+
+#model with just species
+hyp_stan_species <- map2stan(
+                      alist(
+                        hyp ~ dnorm( mu , sigma ) ,
+                        mu <- a + bchill*S_chilense + bchmi*S_chmielewskii + bhab*S_habrochaites+ bpenS_pennellii,
+                        a ~ dnorm(0,100),
+                        c(bchill,bchmi,bhab,bpen ~ dnorm(0,10),
+                        sigma ~ dunif(0,10)
+                      ) ,
+                      data=data2.species)
+                      
+
+
+#with treatment and species both
+
+data2.speciestrt=data2[,c("hyp","trt2",S_chilense","S_chiemelewskii","S_habrochaites","S_pennellii")]
+
+
+#model with just trtL
+hyp_stan_trt_species <- map2stan(
+                      alist(
+                        hyp ~ dnorm( mu , sigma ) ,
+                        mu <- a + bt*trt2+ bchill*S_chilense + bchmi*S_chmielewskii + bhab*S_habrochaites+ bpenS_pennellii,
+                        a ~ dnorm(0,100),
+                        c(bchill,bchmi,bhab,bpen ~ dnorm(0,10),
+                        bT ~ dnorm(0,10),
+                        sigma ~ dunif(0,10)
+                      ) ,
+                      data=data2.specietrts)
+
